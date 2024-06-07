@@ -6,6 +6,8 @@ import { FaRegEnvelope } from "react-icons/fa";
 import { FaRegEyeSlash } from "react-icons/fa";
 import { useFormik } from "formik";
 import axios from "axios";
+import { notification } from "antd";
+import { Spin } from "antd";
 
 const validate = (values) => {
   const errors = {};
@@ -31,6 +33,8 @@ const Login = () => {
   const [type, setType] = useState("password");
   const [icon, setIcon] = useState(<FaRegEyeSlash />);
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+  const [api, contextHolder] = notification.useNotification();
+  const [loading, setLoading] = React.useState(false);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") || "light";
@@ -60,17 +64,28 @@ const Login = () => {
   });
 
   const handleFormSubmit = (values) => {
+    setLoading(true);
     axios
       .post(`${process.env.REACT_APP_API_URL}/login`, values)
       .then((res) => {
         let user = res.data;
         if (user.length !== 0) {
-          console.log(user);
+          openNotification("success", "Login Successful");
         } else {
-          console.log("not found");
+          openNotification("error", "Invalid User");
         }
+        setLoading(false);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        setLoading(false);
+        openNotification("error", "Server Error");
+      });
+  };
+
+  const openNotification = (type, message) => {
+    api[type]({
+      message,
+    });
   };
 
   const handleTheme = () => {
@@ -82,6 +97,8 @@ const Login = () => {
 
   return (
     <>
+      {contextHolder}
+      <Spin spinning={loading} fullscreen />
       <div className="loginMain">
         <div className="grid h-screen grid-cols-12">
           {/*------- Logo Side start --------*/}
