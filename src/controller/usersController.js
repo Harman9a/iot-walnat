@@ -11,15 +11,32 @@ const getUsers = async (req, res) => {
 
 const addUsers = async (req, res) => {
   try {
-    const { name } = req.body;
+    const { email, password } = req.body;
 
-    await pgClient.query("INSERT INTO users (name) VALUES ($1)", [name]);
+    await pgClient.query("INSERT INTO users (email,password) VALUES ($1,$2)", [
+      email,
+      password,
+    ]);
     res.json({
       message: "A new person was created",
       body: {
         user: { name },
       },
     });
+  } catch (err) {
+    res.json(err);
+  }
+};
+
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    let data = await pgClient.query(
+      "SELECT * FROM users where email=$1 AND password=$2",
+      [email, password]
+    );
+    res.status(200).json(data.rows);
   } catch (err) {
     res.json(err);
   }
@@ -51,4 +68,5 @@ module.exports = {
   addUsers,
   updateUsers,
   deleteUsers,
+  loginUser,
 };

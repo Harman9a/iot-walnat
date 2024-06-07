@@ -5,6 +5,7 @@ import { LuKeyRound } from "react-icons/lu";
 import { FaRegEnvelope } from "react-icons/fa";
 import { FaRegEyeSlash } from "react-icons/fa";
 import { useFormik } from "formik";
+import axios from "axios";
 
 const validate = (values) => {
   const errors = {};
@@ -27,16 +28,13 @@ const validate = (values) => {
 };
 
 const Login = () => {
-  const [password, setPassword] = useState("");
   const [type, setType] = useState("password");
   const [icon, setIcon] = useState(<FaRegEyeSlash />);
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
-  const [themeIcon, setThemeIcon] = useState(theme === "dark" ? "sun" : "moon");
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") || "light";
     setTheme(savedTheme);
-    setThemeIcon(savedTheme === "dark" ? "sun" : "moon");
     document.querySelector("html").setAttribute("data-theme", savedTheme);
   }, []);
 
@@ -57,14 +55,27 @@ const Login = () => {
     },
     validate,
     onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
+      handleFormSubmit(values);
     },
   });
+
+  const handleFormSubmit = (values) => {
+    axios
+      .post(`${process.env.REACT_APP_API_URL}/login`, values)
+      .then((res) => {
+        let user = res.data;
+        if (user.length !== 0) {
+          console.log(user);
+        } else {
+          console.log("not found");
+        }
+      })
+      .catch((err) => console.log(err));
+  };
 
   const handleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
-    setThemeIcon(newTheme === "dark" ? "sun" : "moon");
     localStorage.setItem("theme", newTheme);
     document.querySelector("html").setAttribute("data-theme", newTheme);
   };
@@ -153,7 +164,6 @@ const Login = () => {
                 Login
               </h3>
               <h3 className="mt-2 text-center text-sm text-base-content/70">
-                {" "}
                 Seamless Access, Secure Connection: Your Gateway to a
                 Personalized Experience.
               </h3>
@@ -172,13 +182,13 @@ const Login = () => {
                         <FaRegEnvelope />
                         <input
                           placeholder="Email Address"
-                          className="input w-full focus:border-none focus:outline-none input-sm focus:outline-offset-none"
+                          className="input w-full focus:border-none focus:outline-none input-sm focus:outline-offset-none py-2"
                           name="email"
                           onChange={formik.handleChange}
                           value={formik.values.email}
                         />
                       </div>
-                      <span className="h-[20px] mt-3 text-[12px]">
+                      <span className="h-[20px] mt-3 text-[12px] text-rose-600">
                         {formik.errors.email ? (
                           <div>{formik.errors.email}</div>
                         ) : null}
@@ -203,7 +213,7 @@ const Login = () => {
                         />
                         <span onClick={handleToggle}>{icon}</span>
                       </div>
-                      <span className="h-[20px] mt-3 text-[12px]">
+                      <span className="h-[20px] mt-3 text-[12px] text-rose-600">
                         {formik.errors.password ? (
                           <div>{formik.errors.password}</div>
                         ) : null}
