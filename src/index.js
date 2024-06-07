@@ -17,6 +17,6 @@ pgClient.connect((err) => {
       console.log(`Serevr is running on ${process.env.PORT}`);
     });
   } else {
-    console.log({ status: "connection failed", error: err.code });
+    console.log({ status: "connection failed", error: err });
   }
 });

@@ -8,6 +8,7 @@ import { useFormik } from "formik";
 import axios from "axios";
 import { notification } from "antd";
 import { Spin } from "antd";
+import { useNavigate } from "react-router-dom";
 
 const validate = (values) => {
   const errors = {};
@@ -35,6 +36,7 @@ const Login = () => {
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
   const [api, contextHolder] = notification.useNotification();
   const [loading, setLoading] = React.useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") || "light";
@@ -64,22 +66,23 @@ const Login = () => {
   });
 
   const handleFormSubmit = (values) => {
-    setLoading(true);
-    axios
-      .post(`${process.env.REACT_APP_API_URL}/login`, values)
-      .then((res) => {
-        let user = res.data;
-        if (user.length !== 0) {
-          openNotification("success", "Login Successful");
-        } else {
-          openNotification("error", "Invalid User");
-        }
-        setLoading(false);
-      })
-      .catch((err) => {
-        setLoading(false);
-        openNotification("error", "Server Error");
-      });
+    navigate("/dashboard");
+    // setLoading(true);
+    // axios
+    //   .post(`${process.env.REACT_APP_API_URL}/login`, values)
+    //   .then((res) => {
+    //     let user = res.data;
+    //     if (user.length !== 0) {
+    //       openNotification("success", "Login Successful");
+    //     } else {
+    //       openNotification("error", "Invalid User");
+    //     }
+    //     setLoading(false);
+    //   })
+    //   .catch((err) => {
+    //     setLoading(false);
+    //     openNotification("error", "Server Error");
+    //   });
   };
 
   const openNotification = (type, message) => {
