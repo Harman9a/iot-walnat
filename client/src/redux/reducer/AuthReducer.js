@@ -14,7 +14,11 @@ const AuthReducer = (state = istate, action) => {
       return state;
     }
     case "LOGOUT": {
-      state = { ...state, islogin: action.payload.status };
+      state = {
+        ...state,
+        islogin: action.payload.status,
+        jwt: action.payload.jwt,
+      };
       return state;
     }
     default:

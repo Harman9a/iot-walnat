@@ -79,7 +79,7 @@ const Login = () => {
       .then((res) => {
         let user = res.data;
 
-        if (user.length !== 0) {
+        if (user.data.length !== 0) {
           openNotification("success", "Login Successful");
           dipatch(LOGIN({ jwt: user.token, status: true }));
           navigate("/manage-admin");

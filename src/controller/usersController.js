@@ -1,23 +1,26 @@
 const { pgClient } = require("../db/connection");
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const getUsers = async (req, res) => {
+const getAdmins = async (req, res) => {
   try {
-    let data = await pgClient.query("SELECT * FROM users");
+    let data = await pgClient.query("SELECT * FROM users WHERE role=$1", [1]);
     res.status(200).json(data.rows);
   } catch (err) {
     res.status(500).json(err);
   }
 };
 
-const addUsers = async (req, res) => {
+const addAdmin = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { name, email, phone, password, photo, role } = req.body;
 
-    await pgClient.query("INSERT INTO users (email,password) VALUES ($1,$2)", [
-      email,
-      password,
-    ]);
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await pgClient.query(
+      "INSERT INTO users (name,email,phone,password,photo,role) VALUES ($1,$2,$3,$4,$5,$6)",
+      [name, email, phone, hashedPassword, photo, 1]
+    );
     res.json({
       message: "A new person was created",
       body: {
@@ -33,16 +36,23 @@ const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    let data = await pgClient.query(
-      "SELECT * FROM users where email=$1 AND password=$2",
-      [email, password]
-    );
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    let data = await pgClient.query("SELECT * FROM users where email=$1", [
+      email,
+    ]);
+
+    const passwordMatch = await bcrypt.compare(password, data.rows.password);
+
+    // if (!passwordMatch) {
+    //   return res.status(401).json({ error: "Authentication failed" });
+    // }
 
     const token = jwt.sign({ email: email }, "abc", {
-      expiresIn: "1h",
+      expiresIn: "12h",
     });
 
-    res.status(200).json({ user: data.rows, token });
+    res.status(200).json({ data: data.rows, token, hashedPassword });
   } catch (err) {
     res.json(err);
   }
@@ -70,8 +80,8 @@ const deleteUsers = async (req, res) => {
 };
 
 module.exports = {
-  getUsers,
-  addUsers,
+  getAdmins,
+  addAdmin,
   updateUsers,
   deleteUsers,
   loginUser,

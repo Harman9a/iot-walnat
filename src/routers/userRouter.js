@@ -1,10 +1,10 @@
 const { Router } = require("express");
 const {
-  getUsers,
-  addUsers,
+  addAdmin,
   updateUsers,
   deleteUsers,
   loginUser,
+  getAdmins,
 } = require("../controller/usersController");
 const verifyToken = require("../middleware/authMidleware");
 
@@ -12,8 +12,8 @@ const userRouter = Router();
 
 userRouter.post("/loginUser", loginUser);
 
-userRouter.get("/getUsers", verifyToken, getUsers);
-userRouter.post("/addUser", addUsers);
+userRouter.get("/getAdmins", verifyToken, getAdmins);
+userRouter.post("/addAdmin", addAdmin);
 userRouter.post("/updateUser", updateUsers);
 userRouter.post("/deleteUser", deleteUsers);
 
