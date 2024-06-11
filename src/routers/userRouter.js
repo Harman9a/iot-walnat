@@ -6,13 +6,15 @@ const {
   deleteUsers,
   loginUser,
 } = require("../controller/usersController");
+const verifyToken = require("../middleware/authMidleware");
 
 const userRouter = Router();
 
-userRouter.get("/getUsers", getUsers);
+userRouter.post("/loginUser", loginUser);
+
+userRouter.get("/getUsers", verifyToken, getUsers);
 userRouter.post("/addUser", addUsers);
 userRouter.post("/updateUser", updateUsers);
 userRouter.post("/deleteUser", deleteUsers);
-userRouter.post("/loginUser", loginUser);
 
 module.exports = userRouter;

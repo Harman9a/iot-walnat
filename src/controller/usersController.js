@@ -1,4 +1,5 @@
 const { pgClient } = require("../db/connection");
+const jwt = require("jsonwebtoken");
 
 const getUsers = async (req, res) => {
   try {
@@ -36,7 +37,12 @@ const loginUser = async (req, res) => {
       "SELECT * FROM users where email=$1 AND password=$2",
       [email, password]
     );
-    res.status(200).json(data.rows);
+
+    const token = jwt.sign({ email: email }, "abc", {
+      expiresIn: "1h",
+    });
+
+    res.status(200).json({ user: data.rows, token });
   } catch (err) {
     res.json(err);
   }

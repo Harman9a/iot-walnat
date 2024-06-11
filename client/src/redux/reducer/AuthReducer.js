@@ -1,11 +1,16 @@
 const istate = {
+  jwt: "",
   islogin: false,
 };
 
 const AuthReducer = (state = istate, action) => {
   switch (action.type) {
     case "LOGIN": {
-      state = { ...state, islogin: action.payload.status };
+      state = {
+        ...state,
+        islogin: action.payload.status,
+        jwt: action.payload.jwt,
+      };
       return state;
     }
     case "LOGOUT": {

@@ -44,7 +44,7 @@ const Login = () => {
 
   useEffect(() => {
     if (state.auth.islogin !== false) {
-      navigate("/dashboard");
+      navigate("/manage-admin");
     }
     const savedTheme = localStorage.getItem("theme") || "light";
     setTheme(savedTheme);
@@ -78,10 +78,11 @@ const Login = () => {
       .post(`${process.env.REACT_APP_API_URL}/loginUser`, values)
       .then((res) => {
         let user = res.data;
+
         if (user.length !== 0) {
           openNotification("success", "Login Successful");
-          dipatch(LOGIN({ status: true }));
-          navigate("/dashboard");
+          dipatch(LOGIN({ jwt: user.token, status: true }));
+          navigate("/manage-admin");
         } else {
           openNotification("error", "Invalid User");
         }
