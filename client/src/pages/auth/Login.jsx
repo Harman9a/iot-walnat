@@ -9,6 +9,8 @@ import axios from "axios";
 import { notification } from "antd";
 import { Spin } from "antd";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { LOGIN } from "../../redux/actions/AuthActions";
 
 const validate = (values) => {
   const errors = {};
@@ -37,8 +39,13 @@ const Login = () => {
   const [api, contextHolder] = notification.useNotification();
   const [loading, setLoading] = React.useState(false);
   const navigate = useNavigate();
+  const dipatch = useDispatch();
+  const state = useSelector((state) => state);
 
   useEffect(() => {
+    if (state.auth.islogin !== false) {
+      navigate("/dashboard");
+    }
     const savedTheme = localStorage.getItem("theme") || "light";
     setTheme(savedTheme);
     document.querySelector("html").setAttribute("data-theme", savedTheme);
@@ -66,23 +73,24 @@ const Login = () => {
   });
 
   const handleFormSubmit = (values) => {
-    navigate("/dashboard");
-    // setLoading(true);
-    // axios
-    //   .post(`${process.env.REACT_APP_API_URL}/login`, values)
-    //   .then((res) => {
-    //     let user = res.data;
-    //     if (user.length !== 0) {
-    //       openNotification("success", "Login Successful");
-    //     } else {
-    //       openNotification("error", "Invalid User");
-    //     }
-    //     setLoading(false);
-    //   })
-    //   .catch((err) => {
-    //     setLoading(false);
-    //     openNotification("error", "Server Error");
-    //   });
+    setLoading(true);
+    axios
+      .post(`${process.env.REACT_APP_API_URL}/loginUser`, values)
+      .then((res) => {
+        let user = res.data;
+        if (user.length !== 0) {
+          openNotification("success", "Login Successful");
+          dipatch(LOGIN({ status: true }));
+          navigate("/dashboard");
+        } else {
+          openNotification("error", "Invalid User");
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        setLoading(false);
+        openNotification("error", "Server Error");
+      });
   };
 
   const openNotification = (type, message) => {

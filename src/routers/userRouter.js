@@ -9,10 +9,10 @@ const {
 
 const userRouter = Router();
 
-userRouter.get("/get", getUsers);
-userRouter.post("/add", addUsers);
-userRouter.post("/update", updateUsers);
-userRouter.post("/delete", deleteUsers);
-userRouter.post("/login", loginUser);
+userRouter.get("/getUsers", getUsers);
+userRouter.post("/addUser", addUsers);
+userRouter.post("/updateUser", updateUsers);
+userRouter.post("/deleteUser", deleteUsers);
+userRouter.post("/loginUser", loginUser);
 
 module.exports = userRouter;
