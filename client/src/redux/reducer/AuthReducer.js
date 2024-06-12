@@ -1,4 +1,7 @@
 const istate = {
+  name: "",
+  email: "",
+  role: "",
   jwt: "",
   islogin: false,
 };
@@ -8,6 +11,9 @@ const AuthReducer = (state = istate, action) => {
     case "LOGIN": {
       state = {
         ...state,
+        name: action.payload.name,
+        email: action.payload.email,
+        role: action.payload.role,
         islogin: action.payload.status,
         jwt: action.payload.jwt,
       };
@@ -16,8 +22,11 @@ const AuthReducer = (state = istate, action) => {
     case "LOGOUT": {
       state = {
         ...state,
-        islogin: action.payload.status,
-        jwt: action.payload.jwt,
+        name: "",
+        email: "",
+        role: "",
+        islogin: false,
+        jwt: "",
       };
       return state;
     }

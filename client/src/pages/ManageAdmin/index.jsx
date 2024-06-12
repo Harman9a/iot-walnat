@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { CiSearch } from "react-icons/ci";
 import { FaPlus } from "react-icons/fa";
 import { MdOutlineModeEdit } from "react-icons/md";
-// import { Link } from 'react-router-dom';
+import { RiDeleteBin6Line } from "react-icons/ri";
 import { useFormik } from "formik";
 import { IoEyeOutline } from "react-icons/io5";
 import { FaRegEyeSlash } from "react-icons/fa";
@@ -90,6 +90,7 @@ export default function ManageAdmin() {
       email: "",
       phone: "",
       password: "",
+      image: "",
     },
     validate,
     onSubmit: (values) => {
@@ -99,20 +100,56 @@ export default function ManageAdmin() {
 
   const handleFormSubmit = (values) => {
     setLoading(true);
-    axios
-      .post(`${process.env.REACT_APP_API_URL}/addAdmin`, values)
-      .then((res) => {
-        let user = res.data;
 
+    const formData = new FormData();
+    formData.append("name", values.name);
+    formData.append("email", values.email);
+    formData.append("phone", values.phone);
+    formData.append("password", values.password);
+    formData.append("role", values.role);
+    if (values.image && values.image.length > 0) {
+      console.log(values.image[0]);
+      formData.append("image", values.image[0]); // Assuming single file upload. For multiple, loop through the array
+    }
+
+    axios
+      .post(`${process.env.REACT_APP_API_URL}/addAdmin`, formData, {
+        headers: {
+          Authorization: state.jwt,
+        },
+      })
+      .then((res) => {
         getUsers();
         document.getElementById("my_modal_3").close();
-
         setLoading(false);
       })
       .catch((err) => {
         setLoading(false);
       });
   };
+
+  const handleDeleteAdmin = (id) => {
+    setLoading(true);
+    axios
+      .post(
+        `${process.env.REACT_APP_API_URL}/deleteAdmin`,
+        { id },
+        {
+          headers: {
+            Authorization: state.jwt,
+          },
+        }
+      )
+      .then((res) => {
+        console.log(res);
+        getUsers();
+        setLoading(false);
+      })
+      .catch((err) => {
+        setLoading(false);
+      });
+  };
+
   return (
     <>
       <Spin spinning={loading} fullscreen />
@@ -170,6 +207,16 @@ export default function ManageAdmin() {
                     {/*------- Form start ------*/}
                     <div className="mt-3 w-3/4">
                       <form onSubmit={formik.handleSubmit}>
+                        <input
+                          type="file"
+                          name="image"
+                          className="file-input w-full max-w-xs"
+                          onChange={(event) => {
+                            const files = event.target.files;
+                            let myFiles = Array.from(files);
+                            formik.setFieldValue("image", myFiles);
+                          }}
+                        />
                         <div>
                           <div className="form-control">
                             <label className="label">
@@ -328,7 +375,7 @@ export default function ManageAdmin() {
                     <th>Admin</th>
                     <th>Email</th>
                     <th>Admin Phone</th>
-                    <th></th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <br />
@@ -347,14 +394,14 @@ export default function ManageAdmin() {
                               <div className="avatar">
                                 <div className="mask mask-squircle w-12 h-12">
                                   <img
-                                    src="https://img.daisyui.com/tailwind-css-component-profile-2@56w.png"
+                                    src={`${process.env.REACT_APP_PROFILE_URL}/profile/${x.photo}`}
                                     alt="Avatar Tailwind CSS Component"
                                     className="border-2 border-[#CBCBCB] rounded-[18px]"
                                   />
                                 </div>
                               </div>
                               <div>
-                                <div className="font-bold text-base-500 font-[500] text-[19px] landing-[35px]">
+                                <div className="text-base-500 font-[500] text-[19px] landing-[35px]">
                                   {x.name}
                                 </div>
                               </div>
@@ -367,12 +414,22 @@ export default function ManageAdmin() {
                             {x.phone}
                           </td>
                           <td className="bg-base-100 rounded-r-[15px] w-16">
-                            <div className="flex items-center justify-start text-[16px] font-[500] landing-[35px] text-neutral-500 ">
-                              Edit{" "}
-                              <span className="pl-2">
-                                {" "}
-                                <MdOutlineModeEdit />
-                              </span>
+                            <div className="flex">
+                              <div className="flex items-center justify-start text-[14px] font-[500] landing-[35px] text-neutral-500 mx-3 cursor-pointer">
+                                Edit
+                                <span className="pl-1">
+                                  <MdOutlineModeEdit />
+                                </span>
+                              </div>
+                              <div
+                                className="flex items-center justify-start text-[14px] font-[500] landing-[35px] text-neutral-500 cursor-pointer"
+                                onClick={() => handleDeleteAdmin(x.id)}
+                              >
+                                Remove
+                                <span className="pl-1">
+                                  <RiDeleteBin6Line />
+                                </span>
+                              </div>
                             </div>
                           </td>
                         </tr>

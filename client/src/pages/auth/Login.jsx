@@ -78,10 +78,17 @@ const Login = () => {
       .post(`${process.env.REACT_APP_API_URL}/loginUser`, values)
       .then((res) => {
         let user = res.data;
-
         if (user.data.length !== 0) {
           openNotification("success", "Login Successful");
-          dipatch(LOGIN({ jwt: user.token, status: true }));
+          dipatch(
+            LOGIN({
+              name: user.data.name,
+              email: user.data.email,
+              role: user.data.role,
+              jwt: user.token,
+              status: true,
+            })
+          );
           navigate("/manage-admin");
         } else {
           openNotification("error", "Invalid User");

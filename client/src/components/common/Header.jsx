@@ -26,7 +26,7 @@ const Header = ({ handleToggle }) => {
   };
 
   const hanldeLogot = () => {
-    dispatch(LOGOUT({ jwt: "", status: false }));
+    dispatch(LOGOUT());
     naviagte("/");
   };
 
