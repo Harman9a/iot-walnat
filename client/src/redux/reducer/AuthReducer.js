@@ -2,6 +2,8 @@ const istate = {
   name: "",
   email: "",
   role: "",
+  image: "",
+  phone: "",
   jwt: "",
   islogin: false,
 };
@@ -14,6 +16,8 @@ const AuthReducer = (state = istate, action) => {
         name: action.payload.name,
         email: action.payload.email,
         role: action.payload.role,
+        image: action.payload.image,
+        phone: action.payload.phone,
         islogin: action.payload.status,
         jwt: action.payload.jwt,
       };
@@ -25,6 +29,8 @@ const AuthReducer = (state = istate, action) => {
         name: "",
         email: "",
         role: "",
+        image: "",
+        phone: "",
         islogin: false,
         jwt: "",
       };

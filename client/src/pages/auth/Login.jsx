@@ -85,6 +85,8 @@ const Login = () => {
               name: user.data.name,
               email: user.data.email,
               role: user.data.role,
+              image: user.data.image,
+              phone: user.data.phone,
               jwt: user.token,
               status: true,
             })

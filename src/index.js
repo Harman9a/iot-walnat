@@ -13,6 +13,7 @@ app.use("/profile", express.static("./src/profile"));
 
 // Use the user router
 app.use("/api", require("./routers/userRouter"));
+app.use("/api", require("./routers/commonRouter"));
 
 // Connect to PostgreSQL and start the server
 pgClient.connect((err) => {

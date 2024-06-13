@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import Header from "./common/Header";
-import Footer from "./common/Footer";
 import Sidebar from "./common/Sidebar";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -30,11 +29,10 @@ export default function Layout() {
         }`}
       >
         <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
-        <div className="drawer-content">
+        <div className="drawer-content bg-base-200">
           <Header handleToggle={handleToggle} />
           <div>
             <Outlet />
-            {/* <Footer /> */}
           </div>
         </div>
         <div className="drawer-side">
