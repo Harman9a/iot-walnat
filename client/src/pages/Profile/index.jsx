@@ -1,11 +1,88 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import { useFormik } from "formik";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { UPDATE_PROFILE } from "../../redux/actions/AuthActions";
+import TwoFactAuth from "../../components/TwoFactAuth/TwoFactAuth";
+
+const validate = (values) => {
+  const errors = {};
+
+  if (!values.name) {
+    errors.name = "Required";
+  } else if (!/^[0-9a-zA-Z].*/i.test(values.name)) {
+    errors.name = "Invalid username";
+  }
+
+  if (!values.email) {
+    errors.email = "Required";
+  } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
+    errors.email = "Invalid email address";
+  }
+
+  if (!values.phone) {
+    errors.phone = "Required";
+  } else if (
+    !/^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/i.test(
+      values.phone
+    )
+  ) {
+    errors.phone = "Enter max 8 Characters";
+  }
+
+  return errors;
+};
 
 export default function Profile() {
   const state = useSelector((state) => state.auth);
+  const [emailError, setEmailError] = useState("");
+  let dispatch = useDispatch();
+
+  const formik = useFormik({
+    initialValues: {
+      name: state.name,
+      email: state.email,
+      phone: state.phone,
+    },
+    validate,
+    onSubmit: (values) => {
+      verifyUser(values);
+    },
+  });
+
+  const verifyUser = (value) => {
+    document.getElementById("my_modal_2").showModal();
+  };
+
+  // const handleFormSubmit = (values) => {
+  //   setEmailError("");
+
+  //   const formData = new FormData();
+  //   formData.append("name", values.name);
+  //   formData.append("email", values.email);
+  //   formData.append("phone", values.phone);
+  //   formData.append("token", state.jwt);
+
+  //   axios
+  //     .post(`${process.env.REACT_APP_API_URL}/updateProfile`, formData, {
+  //       headers: {
+  //         Authorization: state.jwt,
+  //       },
+  //     })
+  //     .then((res) => {
+  //       dispatch(UPDATE_PROFILE(res.data));
+  //     })
+  //     .catch((err) => {
+  //       if (err.response.data.error === "Email already exists") {
+  //         setEmailError(err.response.data.error);
+  //       }
+  //     });
+  // };
+
   return (
     <div>
+      <TwoFactAuth />
       <div className="content-wrapper bg-base-200">
         <div>
           <div className="flex items-center">
@@ -31,7 +108,7 @@ export default function Profile() {
                 </div>
 
                 <div className="mt-10 w-full">
-                  <form>
+                  <form onSubmit={formik.handleSubmit}>
                     <div>
                       <div className="form-control">
                         <label className="label">
@@ -43,11 +120,16 @@ export default function Profile() {
                           <input
                             type="text"
                             className="input w-full focus:border-none focus:outline-none input-sm focus:outline-offset-none"
-                            name="f-name"
-                            value={state.name}
+                            name="name"
+                            onChange={formik.handleChange}
+                            value={formik.values.name}
                           />
                         </div>
-                        <span className="h-[20px] mt-3 text-[12px]"></span>
+                        <span className="h-[2px] mt-2 text-rose-600 text-[12px]">
+                          {formik.errors.name ? (
+                            <div>{formik.errors.name}</div>
+                          ) : null}
+                        </span>
                       </div>
 
                       <div className="flex items-center justify-between">
@@ -62,10 +144,16 @@ export default function Profile() {
                               className="input w-full focus:border-none focus:outline-none input-sm focus:outline-offset-none"
                               name="email"
                               type="email"
-                              value={state.email}
+                              onChange={formik.handleChange}
+                              value={formik.values.email}
                             />
                           </div>
-                          <span className="h-[20px] mt-3 text-[12px]"></span>
+                          <span className="h-[2px] mt-2 text-rose-600 text-[12px]">
+                            {formik.errors.email ? (
+                              <div>{formik.errors.email}</div>
+                            ) : null}
+                            {emailError !== "" ? <div>{emailError}</div> : null}
+                          </span>
                         </div>
 
                         <div className="form-control mt-3 w-1/2 ml-4">
@@ -77,17 +165,22 @@ export default function Profile() {
                           <div className="form-control flex flex-row items-center rounded-[15px] h-14 bg-base-100 px-3 shadow">
                             <input
                               className="input w-full focus:border-none focus:outline-none input-sm focus:outline-offset-none"
-                              id="telNo"
-                              name="telNo"
+                              id="phone"
+                              name="phone"
                               type="tel"
                               size="20"
                               minlength="9"
                               maxlength="14"
-                              value={state.phone}
+                              onChange={formik.handleChange}
+                              value={formik.values.phone}
                             />
                           </div>
 
-                          <span className="h-[20px] mt-3 text-[12px]"></span>
+                          <span className="h-[2px] mt-3 text-rose-600 text-[12px]">
+                            {formik.errors.phone ? (
+                              <div>{formik.errors.phone}</div>
+                            ) : null}
+                          </span>
                         </div>
                       </div>
                     </div>

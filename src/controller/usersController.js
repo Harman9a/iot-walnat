@@ -72,6 +72,8 @@ const loginUser = async (req, res) => {
         expiresIn: "12h",
       });
 
+      pgClient.query("UPDATE users SET jwt=$1 where email=$2", [token, email]);
+
       res.status(200).json({
         data: {
           name: userData.name,
@@ -85,6 +87,18 @@ const loginUser = async (req, res) => {
     } else {
       return res.status(401).json({ error: "Authentication failed" });
     }
+  } catch (err) {
+    res.json(err);
+  }
+};
+
+const logoutUser = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    pgClient.query("UPDATE users SET jwt=$1 where email=$2", [null, email]);
+
+    res.status(200).json(true);
   } catch (err) {
     res.json(err);
   }
@@ -117,4 +131,5 @@ module.exports = {
   updateUsers,
   deleteAdmin,
   loginUser,
+  logoutUser,
 };

@@ -7,7 +7,6 @@ export default function CategoryTable() {
       <div className="col-12">
         <div className="overflow-x-auto">
           <table className="table">
-            {/* head */}
             <thead className="border-b-2 border-base-300">
               <tr className="text-[#B1B1B1] text-[15px] font-[700] landing-[35px] ">
                 <th>Category</th>
@@ -28,7 +27,6 @@ export default function CategoryTable() {
             </thead>
             <br />
             <tbody className="mt-3">
-              {/* row 1 */}
               <tr className="shadow-[0_3.5px_5.5px_0_#00000005] mb-3 h-20">
                 <td className="bg-base-100 rounded-l-[15px] ">
                   <div className="font-bold text-base-500 font-[900] text-[19px] landing-[35px]">

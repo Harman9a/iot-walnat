@@ -32,8 +32,25 @@ const Header = ({ handleToggle }) => {
   };
 
   const hanldeLogot = () => {
-    dispatch(LOGOUT());
-    naviagte("/");
+    axios
+      .post(
+        `${process.env.REACT_APP_API_URL}/logoutUser`,
+        { email: state.email },
+        {
+          headers: {
+            Authorization: state.jwt,
+          },
+        }
+      )
+      .then((res) => {
+        dispatch(LOGOUT());
+        naviagte("/");
+      })
+      .catch((err) => {
+        if (err.response.data.error === "Invalid token") {
+          hanldeLogot();
+        }
+      });
   };
 
   const verifyTokenStatus = () => {

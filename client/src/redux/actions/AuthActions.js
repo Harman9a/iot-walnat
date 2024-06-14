@@ -11,3 +11,10 @@ export const LOGOUT = (data) => {
     payload: data,
   };
 };
+
+export const UPDATE_PROFILE = (data) => {
+  return {
+    type: "UPDATE_PROFILE",
+    payload: data,
+  };
+};

@@ -15,9 +15,9 @@ const AuthReducer = (state = istate, action) => {
         ...state,
         name: action.payload.name,
         email: action.payload.email,
+        phone: action.payload.phone,
         role: action.payload.role,
         image: action.payload.image,
-        phone: action.payload.phone,
         islogin: action.payload.status,
         jwt: action.payload.jwt,
       };
@@ -33,6 +33,15 @@ const AuthReducer = (state = istate, action) => {
         phone: "",
         islogin: false,
         jwt: "",
+      };
+      return state;
+    }
+    case "UPDATE_PROFILE": {
+      state = {
+        ...state,
+        name: action.payload.name,
+        email: action.payload.email,
+        phone: action.payload.phone,
       };
       return state;
     }
