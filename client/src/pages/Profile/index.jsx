@@ -80,9 +80,13 @@ export default function Profile() {
   //     });
   // };
 
+  const handle2FA = (response) => {
+    console.log(response);
+  };
+
   return (
     <div>
-      <TwoFactAuth />
+      <TwoFactAuth handle2FA={handle2FA} />
       <div className="content-wrapper bg-base-200">
         <div>
           <div className="flex items-center">
