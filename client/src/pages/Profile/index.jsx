@@ -37,6 +37,7 @@ const validate = (values) => {
 export default function Profile() {
   const state = useSelector((state) => state.auth);
   const [emailError, setEmailError] = useState("");
+  const [formValues, setFormValues] = useState();
   let dispatch = useDispatch();
 
   const formik = useFormik({
@@ -52,36 +53,53 @@ export default function Profile() {
   });
 
   const verifyUser = (value) => {
-    document.getElementById("my_modal_2").showModal();
+    axios
+      .get(`${process.env.REACT_APP_API_URL}/sendEmailOTP`, {
+        headers: {
+          Authorization: state.jwt,
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setFormValues(value);
+        document.getElementById("my_modal_2").showModal();
+      })
+      .catch((err) => {
+        if (err.response.data.error === "Email already exists") {
+          setEmailError(err.response.data.error);
+        }
+      });
   };
 
-  // const handleFormSubmit = (values) => {
-  //   setEmailError("");
+  const handleFormSubmit = (values) => {
+    setEmailError("");
 
-  //   const formData = new FormData();
-  //   formData.append("name", values.name);
-  //   formData.append("email", values.email);
-  //   formData.append("phone", values.phone);
-  //   formData.append("token", state.jwt);
+    const formData = new FormData();
+    formData.append("name", values.name);
+    formData.append("email", values.email);
+    formData.append("phone", values.phone);
+    formData.append("token", state.jwt);
 
-  //   axios
-  //     .post(`${process.env.REACT_APP_API_URL}/updateProfile`, formData, {
-  //       headers: {
-  //         Authorization: state.jwt,
-  //       },
-  //     })
-  //     .then((res) => {
-  //       dispatch(UPDATE_PROFILE(res.data));
-  //     })
-  //     .catch((err) => {
-  //       if (err.response.data.error === "Email already exists") {
-  //         setEmailError(err.response.data.error);
-  //       }
-  //     });
-  // };
+    axios
+      .post(`${process.env.REACT_APP_API_URL}/updateProfile`, formData, {
+        headers: {
+          Authorization: state.jwt,
+        },
+      })
+      .then((res) => {
+        dispatch(UPDATE_PROFILE(res.data));
+      })
+      .catch((err) => {
+        if (err.response.data.error === "Email already exists") {
+          setEmailError(err.response.data.error);
+        }
+      });
+  };
 
   const handle2FA = (response) => {
-    console.log(response);
+    if (response === true) {
+      handleFormSubmit(formValues);
+    }
   };
 
   return (

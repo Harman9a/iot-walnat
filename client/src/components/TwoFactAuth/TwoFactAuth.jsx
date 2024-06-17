@@ -7,14 +7,14 @@ export default function TwoFactAuth({ handle2FA }) {
   const [current, setCurrent] = useState(0);
   const { token } = theme.useToken();
 
-  let OTP = 1234;
-
   const next = () => {
     setCurrent(current + 1);
   };
 
   const handleSubmitfinal = (value) => {
-    console.log(value);
+    handle2FA(value);
+    setCurrent(0);
+    document.getElementById("my_modal_2").close();
   };
 
   const steps = [

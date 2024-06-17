@@ -1,22 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "antd";
+import OtpInput from "react18-input-otp";
 
 export default function TwoFactGoogleAuth({ handleSubmitfinal }) {
-  const OTPInput = () => {
-    return (
-      <input
-        type="text"
-        className="mx-2 bg-base-200 text-base-content border border-[#EAEAEA] text-center rounded-[20px] text-[52px] font-[700]"
-        style={{ width: "58px", height: "80px" }}
-        maxLength={1}
-      />
-    );
-  };
+  const [code, setCode] = useState("");
+  const [generatedOTP, setGeneratedOTP] = useState(123456);
+  const [error, setError] = useState(null);
 
   const handleSubmit = () => {
-    console.log("google");
-    handleSubmitfinal(true);
+    if (code == generatedOTP) {
+      setError(null);
+      setCode("");
+      handleSubmitfinal(true);
+    } else {
+      setError("Invalid OTP Code");
+    }
   };
+
+  const handleChange = (code) => setCode(code);
 
   return (
     <>
@@ -32,10 +33,22 @@ export default function TwoFactGoogleAuth({ handleSubmitfinal }) {
           className="flex items-center justify-center flex-col"
         >
           <div className="sets mb-5">
-            <OTPInput />
-            <OTPInput />
-            <OTPInput />
-            <OTPInput />
+            <OtpInput
+              className="border p-1 m-1"
+              value={code}
+              onChange={handleChange}
+              numInputs={6}
+              id="myInput"
+              placeholder=""
+              isSuccessed={false}
+              errorStyle="error"
+              successStyle="success"
+              separateAfter={1}
+              shouldAutoFocus
+            />
+          </div>
+          <div>
+            <p className="h-[2px] text-rose-600 text-[12px]">{error}</p>
           </div>
         </form>
       </div>
