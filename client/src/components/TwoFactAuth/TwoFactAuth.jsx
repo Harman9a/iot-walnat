@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Steps, theme } from "antd";
 import TwoFactEmailAuth from "./TwoFactEmailAuth";
 import TwoFactGoogleAuth from "./TwoFactGoogleAuth";
+import { SiTicktick } from "react-icons/si";
 
 export default function TwoFactAuth({ handle2FA }) {
   const [current, setCurrent] = useState(0);
@@ -15,6 +16,10 @@ export default function TwoFactAuth({ handle2FA }) {
     handle2FA(value);
     setCurrent(0);
     document.getElementById("my_modal_2").close();
+    document.getElementById("my_modal_adminSuccess").showModal();
+    setTimeout(() => {
+      document.getElementById("my_modal_adminSuccess").close();
+    }, 1000);
   };
 
   const steps = [
@@ -47,6 +52,16 @@ export default function TwoFactAuth({ handle2FA }) {
         <Steps current={current} items={items} />
         <div style={contentStyle}>{steps[current].content}</div>
       </div>
+      <dialog id="my_modal_adminSuccess" className="modal">
+        <div className="modal-box py-16 px-12 bg-[#30BF89] max-w-[40rem] h-[30rem] flex flex-col items-center justify-center">
+          <div className="text-[#fff]  text-[90px] flex items-center justify-center">
+            <SiTicktick />
+          </div>
+          <h3 className="font-bold text-center text-[27px] font-[700] text-[#fff] landing-[27px] mt-5">
+            Success
+          </h3>
+        </div>
+      </dialog>
     </dialog>
   );
 }

@@ -71,6 +71,12 @@ export default function Profile() {
       });
   };
 
+  const handle2FA = (response) => {
+    if (response === true) {
+      handleFormSubmit(formValues);
+    }
+  };
+
   const handleFormSubmit = (values) => {
     setEmailError("");
 
@@ -94,12 +100,6 @@ export default function Profile() {
           setEmailError(err.response.data.error);
         }
       });
-  };
-
-  const handle2FA = (response) => {
-    if (response === true) {
-      handleFormSubmit(formValues);
-    }
   };
 
   return (

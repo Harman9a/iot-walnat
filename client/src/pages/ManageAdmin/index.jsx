@@ -6,11 +6,13 @@ import { useSelector } from "react-redux";
 import { Spin } from "antd";
 import AdminTable from "./AdminTable";
 import AdminAddModal from "./AdminAddModal";
+import TwoFactAuth from "../../components/TwoFactAuth/TwoFactAuth";
 
 export default function ManageAdmin() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = React.useState(false);
   const state = useSelector((state) => state.auth);
+  const [formValues, setFormValues] = useState();
 
   useEffect(() => {
     getUsers();
@@ -53,8 +55,32 @@ export default function ManageAdmin() {
       });
   };
 
+  const verifyUser = (value) => {
+    axios
+      .get(`${process.env.REACT_APP_API_URL}/sendEmailOTP`, {
+        headers: {
+          Authorization: state.jwt,
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setFormValues(value);
+        document.getElementById("my_modal_2").showModal();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const handle2FA = (response) => {
+    if (response === true) {
+      handleDeleteAdmin(formValues);
+    }
+  };
+
   return (
     <>
+      <TwoFactAuth handle2FA={handle2FA} />
       <Spin spinning={loading} fullscreen />
       <div className="content-wrapper bg-base-200">
         <div className="flex items-center justify-between">
@@ -90,7 +116,7 @@ export default function ManageAdmin() {
         </div>
         <AdminAddModal getUsers={getUsers} state={state} />
 
-        <AdminTable users={users} handleDeleteAdmin={handleDeleteAdmin} />
+        <AdminTable users={users} handleDeleteAdmin={verifyUser} />
       </div>
     </>
   );

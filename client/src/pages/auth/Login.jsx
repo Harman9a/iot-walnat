@@ -89,6 +89,7 @@ const Login = () => {
               phone: user.data.phone,
               jwt: user.token,
               status: true,
+              google_secret: JSON.parse(user.data.google_secret).base32,
             })
           );
           navigate("/manage-admin");

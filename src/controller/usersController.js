@@ -12,6 +12,22 @@ const getAdmins = async (req, res) => {
   }
 };
 
+const getSingleAdmins = async (req, res) => {
+  try {
+    let { email } = req.body;
+
+    let data = await pgClient.query("SELECT * FROM users WHERE email=$1", [
+      email,
+    ]);
+
+    res
+      .status(200)
+      .json({ totp: data.rows[0].totp, totp_qr: data.rows[0].totp_qr });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
+
 const addAdmin = async (req, res) => {
   uploadImage(req, res, async function (err) {
     if (err) {
@@ -51,6 +67,25 @@ const addAdmin = async (req, res) => {
   });
 };
 
+const checkEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Check if the email already exists
+    const emailCheckResult = await pgClient.query(
+      "SELECT * FROM users WHERE email = $1",
+      [email]
+    );
+
+    if (emailCheckResult.rows.length > 0) {
+      return res.status(400).json({ error: "Email already exists" });
+    }
+    res.send(true);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -81,6 +116,7 @@ const loginUser = async (req, res) => {
           role: userData.role,
           image: userData.photo,
           phone: userData.phone,
+          google_secret: userData.totp,
         },
         token,
       });
@@ -132,4 +168,6 @@ module.exports = {
   deleteAdmin,
   loginUser,
   logoutUser,
+  getSingleAdmins,
+  checkEmail,
 };

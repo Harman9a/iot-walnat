@@ -3,6 +3,7 @@ import React, { useRef, useState } from "react";
 import { FaRegEyeSlash } from "react-icons/fa";
 import axios from "axios";
 import { IoEyeOutline } from "react-icons/io5";
+import TwoFactAuth from "../../components/TwoFactAuth/TwoFactAuth";
 
 const validate = (values) => {
   const errors = {};
@@ -45,6 +46,7 @@ export default function AdminAddModal({ getUsers, state }) {
   const [type, setType] = useState("password");
   const [icon, setIcon] = useState(<FaRegEyeSlash />);
   const [emailError, setEmailError] = useState("");
+  const [formValues, setFormValues] = useState();
 
   const formik = useFormik({
     initialValues: {
@@ -56,39 +58,61 @@ export default function AdminAddModal({ getUsers, state }) {
     },
     validate,
     onSubmit: (values) => {
-      handleFormSubmit(values);
+      checkEmail(values);
     },
   });
 
+  const checkEmail = (values) => {
+    axios
+      .post(
+        `${process.env.REACT_APP_API_URL}/checkEmail`,
+        { email: values.email },
+        {
+          headers: {
+            Authorization: state.jwt,
+          },
+        }
+      )
+      .then((res) => {
+        if (res.data === true) {
+          setEmailError("");
+          verifyUser(values);
+        }
+      })
+      .catch((err) => {
+        if (err.response.data.error === "Email already exists") {
+          setEmailError(err.response.data.error);
+        }
+      });
+  };
+
+  const verifyUser = (value) => {
+    axios
+      .get(`${process.env.REACT_APP_API_URL}/sendEmailOTP`, {
+        headers: {
+          Authorization: state.jwt,
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setFormValues(value);
+        document.getElementById("my_modal_2").showModal();
+      })
+      .catch((err) => {
+        if (err.response.data.error === "Email already exists") {
+          setEmailError(err.response.data.error);
+        }
+      });
+  };
+
+  const handle2FA = (response) => {
+    if (response === true) {
+      handleFormSubmit(formValues);
+    }
+  };
+
   const handleUploadPhoto = () => {
     uploadRef.current.click();
-  };
-
-  const handleFileSelect = (event) => {
-    if (event.target.value !== "") {
-      const files = event.target.files;
-      let myFiles = Array.from(files);
-
-      const reader = new FileReader();
-
-      reader.onload = (e) => {
-        setImageSrc(e.target.result);
-      };
-
-      reader.readAsDataURL(files[0]);
-
-      formik.setFieldValue("image", myFiles);
-    }
-  };
-
-  const handleToggle = () => {
-    if (type === "password") {
-      setIcon(<IoEyeOutline />);
-      setType("text");
-    } else {
-      setIcon(<FaRegEyeSlash />);
-      setType("password");
-    }
   };
 
   const handleFormSubmit = (values) => {
@@ -122,8 +146,37 @@ export default function AdminAddModal({ getUsers, state }) {
         }
       });
   };
+
+  const handleFileSelect = (event) => {
+    if (event.target.value !== "") {
+      const files = event.target.files;
+      let myFiles = Array.from(files);
+
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        setImageSrc(e.target.result);
+      };
+
+      reader.readAsDataURL(files[0]);
+
+      formik.setFieldValue("image", myFiles);
+    }
+  };
+
+  const handleToggle = () => {
+    if (type === "password") {
+      setIcon(<IoEyeOutline />);
+      setType("text");
+    } else {
+      setIcon(<FaRegEyeSlash />);
+      setType("password");
+    }
+  };
+
   return (
     <dialog id="my_modal_3" className="modal">
+      <TwoFactAuth handle2FA={handle2FA} />
       <div className="modal-box bg-base-200 max-w-[50rem] h-full">
         <form method="dialog">
           <button className="btn text-[20px] btn-circle btn-ghost absolute right-2 top-2">

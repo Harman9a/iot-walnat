@@ -1,63 +1,69 @@
-// import React, { useState } from "react";
-// import speakeasy from "speakeasy";
-// import QRCode from "qrcode";
-// import { Buffer } from "buffer";
-// import base32 from "base32.js";
-// import "./App.css";
-
-// export default function Settings() {
-//   const [qrCode, setQrCode] = useState("");
-//   const [secret, setSecret] = useState("");
-//   const [token, setToken] = useState("");
-//   const [notification, setNotification] = useState("");
-
-//   const generateQrCode = async () => {
-//     const secret = speakeasy.generateSecret({ name: "React_OIT" });
-//     setSecret(secret.base32);
-//     const data_url = await QRCode.toDataURL(secret.otpauth_url);
-//     setQrCode(data_url);
-//   };
-
-//   const verifyToken = () => {
-//     const secretBuffer = Buffer.from(base32.decode(secret));
-//     const verified = speakeasy.totp.verify({
-//       secret: secretBuffer,
-//       encoding: "buffer",
-//       token,
-//     });
-//     setNotification(verified ? "OTP Verified!" : "OTP Invalid!");
-//     setTimeout(() => {
-//       setNotification("");
-//     }, 3000);
-//   };
-
-//   return (
-//     <div className="container">
-//       <button onClick={generateQrCode}>Generate QR Code</button>
-//       {qrCode && (
-//         <div className="qr-code">
-//           <img src={qrCode} alt="QR Code" />
-//           <p>Secret: {secret}</p>
-//         </div>
-//       )}
-//       <input
-//         type="text"
-//         value={token}
-//         onChange={(e) => setToken(e.target.value)}
-//         placeholder="Enter OTP"
-//       />
-//       <button onClick={verifyToken}>Verify OTP</button>
-//       {notification && (
-//         <div className={notification === "OTP Verified!" ? "success" : "error"}>
-//           {notification}
-//         </div>
-//       )}
-//     </div>
-//   );
-// }
-
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useSelector } from "react-redux";
 
 export default function Settings() {
-  return <div>Settings</div>;
+  const [googleSecret, setGoogleSecret] = useState();
+  const [googleQr, setGoogleQr] = useState();
+  const state = useSelector((state) => state.auth);
+  useEffect(() => {
+    getData();
+  });
+
+  const getData = () => {
+    axios
+      .post(
+        `${process.env.REACT_APP_API_URL}/getSingleAdmin`,
+        { email: state.email },
+        {
+          headers: {
+            Authorization: state.jwt,
+          },
+        }
+      )
+      .then((res) => {
+        setGoogleQr(res.data.totp_qr);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const handleGenerateTOTP = () => {
+    axios
+      .post(
+        `${process.env.REACT_APP_API_URL}/generateGoogleOTP`,
+        { email: state.email },
+        {
+          headers: {
+            Authorization: state.jwt,
+          },
+        }
+      )
+      .then((res) => {
+        getData();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  return (
+    <div>
+      <div className="p-4">
+        <button
+          className="btn btn-neutral"
+          onClick={() => handleGenerateTOTP()}
+        >
+          Generate Google Authenticator QR
+        </button>
+        <div className="p-4">
+          <div className="my-4">
+            <h5>Google Auth QR Code</h5>
+          </div>
+          {getData !== null ? <img src={googleQr} /> : <></>}
+        </div>
+      </div>
+    </div>
+  );
 }

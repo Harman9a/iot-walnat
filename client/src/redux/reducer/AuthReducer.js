@@ -6,6 +6,7 @@ const istate = {
   phone: "",
   jwt: "",
   islogin: false,
+  google_secret: "",
 };
 
 const AuthReducer = (state = istate, action) => {
@@ -20,6 +21,7 @@ const AuthReducer = (state = istate, action) => {
         image: action.payload.image,
         islogin: action.payload.status,
         jwt: action.payload.jwt,
+        google_secret: action.payload.google_secret,
       };
       return state;
     }
@@ -33,6 +35,7 @@ const AuthReducer = (state = istate, action) => {
         phone: "",
         islogin: false,
         jwt: "",
+        google_secret: "",
       };
       return state;
     }

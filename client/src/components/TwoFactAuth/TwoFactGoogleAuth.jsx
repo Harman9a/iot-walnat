@@ -1,20 +1,41 @@
 import React, { useState } from "react";
 import { Button } from "antd";
 import OtpInput from "react18-input-otp";
+import { useSelector } from "react-redux";
+import axios from "axios";
 
 export default function TwoFactGoogleAuth({ handleSubmitfinal }) {
   const [code, setCode] = useState("");
   const [generatedOTP, setGeneratedOTP] = useState(123456);
   const [error, setError] = useState(null);
+  const state = useSelector((state) => state.auth);
 
   const handleSubmit = () => {
-    if (code == generatedOTP) {
-      setError(null);
-      setCode("");
-      handleSubmitfinal(true);
-    } else {
-      setError("Invalid OTP Code");
-    }
+    axios
+      .post(
+        `${process.env.REACT_APP_API_URL}/verifyGoogleOTP`,
+        {
+          secret: state.google_secret,
+          token: code,
+        },
+        {
+          headers: {
+            Authorization: state.jwt,
+          },
+        }
+      )
+      .then((res) => {
+        if (res.data.verified === true) {
+          setError(null);
+          setCode("");
+          handleSubmitfinal(true);
+        } else {
+          setError("Invalid OTP Code");
+        }
+      })
+      .catch((err) => {
+        setError("Invalid OTP Code");
+      });
   };
 
   const handleChange = (code) => setCode(code);
